@@ -5,11 +5,12 @@ export function parseArgs(argv, config = {}) {
   const options = {};
   const positionals = [];
   let passthrough = false;
+  let stopOptions = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
 
-    if (passthrough) {
+    if (passthrough || stopOptions) {
       positionals.push(token);
       continue;
     }
@@ -21,6 +22,9 @@ export function parseArgs(argv, config = {}) {
 
     if (!token.startsWith("-") || token === "-") {
       positionals.push(token);
+      if (config.stopAtFirstPositional) {
+        stopOptions = true;
+      }
       continue;
     }
 

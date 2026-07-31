@@ -751,7 +751,10 @@ async function resumeThread(client, threadId, cwd, options = {}) {
   return client.request("thread/resume", buildResumeParams(threadId, cwd, options));
 }
 
-function buildResultStatus(turnState) {
+export function buildResultStatus(turnState) {
+  if (turnState.error) {
+    return 1;
+  }
   return turnState.finalTurn?.status === "completed" ? 0 : 1;
 }
 
