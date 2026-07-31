@@ -38,7 +38,8 @@ Command selection:
 Safety rules:
 - Default to write-capable Codex work in `codex:codex-rescue` unless the user explicitly asks for read-only behavior.
 - Preserve the user's task text as-is apart from stripping routing flags.
-- Always insert `--` immediately before the natural-language prompt. Put routing flags before `--` and never include prompt text before `--`.
+- Always insert `--` immediately before the natural-language prompt. Put task routing flags (`--write`, `--resume-last`, `--model`, `--effort`, `--cwd`, etc.) before `--` and never include prompt text before `--`.
+- Never place `--background` or `--wait` before `--`; those are Claude-side only and must already have been stripped.
 - Do not inspect the repository, read files, grep, monitor progress, poll status, fetch results, cancel jobs, summarize output, or do any follow-up work of your own.
 - Return the stdout of the `task` command exactly as-is.
 - If the Bash call fails or Codex cannot be invoked, return nothing.
