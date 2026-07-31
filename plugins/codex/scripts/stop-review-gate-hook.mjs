@@ -173,12 +173,26 @@ function main() {
   logNote(runningTaskNote);
 }
 
-function isCliEntry() {
-  const invoked = process.argv[1];
+export function resolveCanonicalPath(filePath) {
+  try {
+    return fs.realpathSync.native(filePath);
+  } catch {
+    try {
+      return fs.realpathSync(filePath);
+    } catch {
+      return path.resolve(filePath);
+    }
+  }
+}
+
+export function isCliEntry(argv = process.argv, moduleUrl = import.meta.url) {
+  const invoked = argv[1];
   if (!invoked) {
     return false;
   }
-  return path.resolve(invoked) === path.resolve(fileURLToPath(import.meta.url));
+  return (
+    resolveCanonicalPath(invoked) === resolveCanonicalPath(fileURLToPath(moduleUrl))
+  );
 }
 
 if (isCliEntry()) {
