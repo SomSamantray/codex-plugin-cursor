@@ -41,3 +41,44 @@ test("parseArgs honors -- passthrough before stopAtFirstPositional matters", () 
   assert.equal(result.options.model, undefined);
   assert.equal(result.positionals.join(" "), "-m pytest");
 });
+
+test("stopAtFirstPositional stops after unrecognized long option becomes positional", () => {
+  const result = parseArgs(["--write", "--coverage", "run", "-m", "pytest"], {
+    ...TASK_CONFIG,
+    stopAtFirstPositional: true
+  });
+
+  assert.equal(result.options.write, true);
+  assert.equal(result.options.model, undefined);
+  assert.equal(result.positionals.join(" "), "--coverage run -m pytest");
+});
+
+test("without stopAtFirstPositional unrecognized long then -m still sets model", () => {
+  const result = parseArgs(["--write", "--coverage", "run", "-m", "pytest"], TASK_CONFIG);
+
+  assert.equal(result.options.write, true);
+  assert.equal(result.options.model, "pytest");
+  assert.equal(result.positionals.join(" "), "--coverage run");
+});
+
+test("stopAtFirstPositional stops after unrecognized short option becomes positional", () => {
+  const result = parseArgs(["--write", "-z", "-m", "pytest"], {
+    ...TASK_CONFIG,
+    stopAtFirstPositional: true
+  });
+
+  assert.equal(result.options.write, true);
+  assert.equal(result.options.model, undefined);
+  assert.equal(result.positionals.join(" "), "-z -m pytest");
+});
+
+test("stopAtFirstPositional still parses recognized flags before first positional", () => {
+  const result = parseArgs(["--write", "--model", "spark", "fix it"], {
+    ...TASK_CONFIG,
+    stopAtFirstPositional: true
+  });
+
+  assert.equal(result.options.write, true);
+  assert.equal(result.options.model, "spark");
+  assert.equal(result.positionals.join(" "), "fix it");
+});

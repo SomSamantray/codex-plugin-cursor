@@ -3,8 +3,21 @@ import test from "node:test";
 
 import {
   buildResultStatus,
+  resolveErrorProgressPhase,
   shouldStoreTurnError
 } from "../plugins/codex/scripts/lib/codex.mjs";
+
+test("resolveErrorProgressPhase uses retrying for willRetry errors", () => {
+  assert.equal(
+    resolveErrorProgressPhase({
+      willRetry: true,
+      error: { message: "x" }
+    }),
+    "retrying"
+  );
+  assert.equal(resolveErrorProgressPhase({ error: { message: "x" } }), "failed");
+  assert.equal(resolveErrorProgressPhase({}), "failed");
+});
 
 test("shouldStoreTurnError ignores retriable app-server errors", () => {
   assert.equal(

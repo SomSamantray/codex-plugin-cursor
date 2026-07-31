@@ -50,6 +50,9 @@ export function parseArgs(argv, config = {}) {
       }
 
       positionals.push(token);
+      if (config.stopAtFirstPositional) {
+        stopOptions = true;
+      }
       continue;
     }
 
@@ -72,6 +75,9 @@ export function parseArgs(argv, config = {}) {
     }
 
     positionals.push(token);
+    if (config.stopAtFirstPositional) {
+      stopOptions = true;
+    }
   }
 
   return { options, positionals };

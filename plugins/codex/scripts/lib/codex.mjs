@@ -539,12 +539,16 @@ function applyTurnNotification(state, message) {
         emitProgress(
           state.onProgress,
           `Codex error (retrying): ${message.params.error?.message ?? "unknown error"}`,
-          "failed"
+          resolveErrorProgressPhase(message.params)
         );
         break;
       }
       state.error = message.params.error;
-      emitProgress(state.onProgress, `Codex error: ${message.params.error.message}`, "failed");
+      emitProgress(
+        state.onProgress,
+        `Codex error: ${message.params.error.message}`,
+        resolveErrorProgressPhase(message.params)
+      );
       break;
     case "turn/completed":
       if ((message.params.threadId ?? null) !== state.threadId) {
@@ -764,6 +768,10 @@ async function resumeThread(client, threadId, cwd, options = {}) {
 
 export function shouldStoreTurnError(params = {}) {
   return Boolean(params.error) && params.willRetry !== true;
+}
+
+export function resolveErrorProgressPhase(params = {}) {
+  return params.willRetry === true ? "retrying" : "failed";
 }
 
 export function buildResultStatus(turnState) {
