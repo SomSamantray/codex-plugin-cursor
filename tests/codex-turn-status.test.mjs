@@ -1,7 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildResultStatus } from "../plugins/codex/scripts/lib/codex.mjs";
+import {
+  buildResultStatus,
+  shouldStoreTurnError
+} from "../plugins/codex/scripts/lib/codex.mjs";
+
+test("shouldStoreTurnError ignores retriable app-server errors", () => {
+  assert.equal(
+    shouldStoreTurnError({
+      error: { message: "transient" },
+      willRetry: true
+    }),
+    false
+  );
+  assert.equal(
+    shouldStoreTurnError({
+      error: { message: "terminal" }
+    }),
+    true
+  );
+});
 
 test("buildResultStatus fails when turnState.error is set despite completed finalTurn", () => {
   const status = buildResultStatus({

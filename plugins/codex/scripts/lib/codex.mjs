@@ -535,6 +535,14 @@ function applyTurnNotification(state, message) {
       }
       break;
     case "error":
+      if (message.params?.willRetry) {
+        emitProgress(
+          state.onProgress,
+          `Codex error (retrying): ${message.params.error?.message ?? "unknown error"}`,
+          "failed"
+        );
+        break;
+      }
       state.error = message.params.error;
       emitProgress(state.onProgress, `Codex error: ${message.params.error.message}`, "failed");
       break;
@@ -550,6 +558,9 @@ function applyTurnNotification(state, message) {
         "finalizing"
       );
       completeTurn(state, message.params.turn);
+      if (message.params.turn.status === "completed") {
+        state.error = null;
+      }
       break;
     default:
       break;
@@ -749,6 +760,10 @@ async function startThread(client, cwd, options = {}) {
 
 async function resumeThread(client, threadId, cwd, options = {}) {
   return client.request("thread/resume", buildResumeParams(threadId, cwd, options));
+}
+
+export function shouldStoreTurnError(params = {}) {
+  return Boolean(params.error) && params.willRetry !== true;
 }
 
 export function buildResultStatus(turnState) {
