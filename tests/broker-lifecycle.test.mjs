@@ -146,6 +146,7 @@ test("clearBrokerSession tolerates EPERM on the state file and does not throw", 
 
   clearBrokerSession(cwd);
 
+  assert.equal(fs.existsSync(stateFile), true);
+
   fs.unlinkSync = originalUnlinkSync;
-  assert.doesNotThrow(() => saveBrokerSession(cwd, { endpoint: "pipe://test", pid: 4321 }));
 });
